@@ -38,8 +38,8 @@ int mandelbrot(void)
 		j = 0;
 		while (j < img.bits_per_pixel)
 		{
-			x = (i - 960) / 480.0;            // ピクセルの位置を定数Cの実部に変換
-			y = (j - 540) / 480.0;            // ピクセルの位置を定数Cの虚部に変換
+			x = (i - img.line_length / 2) / (img.line_length / 4);            // ピクセルの位置を定数Cの実部に変換
+			y = (j - img.bits_per_pixel / 2) / (img.line_length / 4);            // ピクセルの位置を定数Cの虚部に変換
 			a = 0.0;                          // zの実部を0に初期化
 			b = 0.0;                          // zの虚部を0に初期化
 			k = 0;                            // くり返し回数を0に初期化
