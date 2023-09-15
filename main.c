@@ -36,26 +36,18 @@ int	calculate(double a, double b,t_data img, int i, int j)
 		k++;
 	}
 	if (k == K_MAX)
-		my_mlx_pixel_put(&img, i, j, 0x000000);  // (i,j)の位置のピクセルを「マンデルブロ集合でない色」で塗りつぶして
-	else if (k < K_MAX && k > K_MAX * 0.2)
-		my_mlx_pixel_put(&img, i, j, 0x00CC66FF);  // (i,j)の位置のピクセルを「マンデルブロ集合である色」で塗りつぶして
+		my_mlx_pixel_put(&img, i, j, 0xff00ff);  // (i,j)の位置のピクセルを「マンデルブロ集合でない色」で塗りつぶして
+	else if (k < K_MAX && k > K_MAX * 0.04)
+		my_mlx_pixel_put(&img, i, j, 0x00990000);  // (i,j)の位置のピクセルを「マンデルブロ集合である色」で塗りつぶして
 	else
-		my_mlx_pixel_put(&img, i, j, 0x00FF66FF);  // (i,j)の位置のピクセルを「マンデルブロ集合である色」で塗りつぶして
+		my_mlx_pixel_put(&img, i, j, 0x000000);  // (i,j)の位置のピクセルを「マンデルブロ集合である色」で塗りつぶして
 	return (j + 1);
 }
 
-double my_atof(char *str)
+double my_atof(char *str, int i, int j, double num, double dec)
 {
-	int i;
-	int j;
-	double num;
-	double dec;
 	int sign;
 
-	i = 0;
-	j = 0;
-	num = 0;
-	dec = 0;
 	sign = 1;
 	if (str[i] == '-')
 	{
@@ -63,107 +55,99 @@ double my_atof(char *str)
 		i++;
 	}
 	while (str[i] != '.' && str[i] != '\0')
-	{
-		num = num * 10 + (str[i] - '0');
-		i++;
-	}
+		num = num * 10 + (str[i++] - '0');
 	if (str[i] == '.')
 	{
 		i++;
 		while (str[i] != '\0')
 		{
-			dec = dec * 10 + (str[i] - '0');
-			i++;
+			dec = dec * 10 + (str[i++] - '0');
 			j++;
 		}
 	}
-	while (j > 0)
-	{
+	while (j-- > 0)
 		dec = dec / 10;
-		j--;
-	}
 	return (sign * (num + dec));
 }
 
-int julia(t_data img, char *real, char *imaginary)
+int	julia(t_data img, char *real, char *imaginary)
 {
-	int i, j;                              // ループカウンタ
-	double a, b;                              // くり返し計算に使う複素数z                          // 定数C
+	int		i;
+	int		j;
+	double	a;
+	double	b;
+
 	i = 0;
-	img.constant_x = my_atof(real);
-	img.constant_y = my_atof(imaginary);
+	img.constant_x = my_atof (real, 0, 0, 0, 0);
+	img.constant_y = my_atof (imaginary, 0, 0, 0, 0);
 	while (i < WIDTH)
 	{
 		j = 0;
 		while (j < HEIGHT)
 		{
-			a = (i - WIDTH / 2.0) / (WIDTH / 4.0);  // 複素数zの実部
-			b = (j - HEIGHT / 2.0) / (HEIGHT / 4.0);  // 複素数zの虚部
+			a = (i - WIDTH / 2.0) / (WIDTH / 4.0);
+			b = (j - HEIGHT / 2.0) / (HEIGHT / 4.0);
 			j = calculate(a, b, img, i, j);
 		}
 		i++;
 	}
-	return 0;
+	return (0);
 }
 
-int mandelbrot(t_data img)
+int	mandelbrot(t_data img)
 {
-	int i, j;                              // ループカウンタ                              // 定数C
-	// double a, b;                              // くり返し計算に使う複素数z                        // くり返し計算に使う複素数z（更新用）
+	int	i;
+	int	j;
+
 	i = 0;
 	while (i < WIDTH)
 	{
 		j = 0;
 		while (j < HEIGHT)
 		{
-			img.constant_x = (i - WIDTH / 2.0) / (WIDTH / 4.0);  // 定数Cの実部
-			img.constant_y = (j - HEIGHT / 2.0) / (HEIGHT / 4.0);  // 定数Cの虚部
+			img.constant_x = (i - WIDTH / 2.0) / (WIDTH / 4.0);
+			img.constant_y = (j - HEIGHT / 2.0) / (HEIGHT / 4.0);
 			j = calculate(0, 0, img, i, j);
 		}
 		i++;
 	}
-	return 0;
+	return (0);
 }
 
-void hoge(char *str, char **argv)
+void	create_img_and_select(char *str, char **argv)
 {
-	void *mlx;
-	void *mlx_win;
-	t_data img;
+	void	*mlx;
+	void	*mlx_win;
+	t_data	img;
 
 	mlx = mlx_init();
 	mlx_win = mlx_new_window(mlx, WIDTH, HEIGHT, str);
 	img.img = mlx_new_image(mlx, WIDTH, HEIGHT);
-	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
-								&img.endian);
-	if (ft_strncmp(str, "Mandelbrot",11) == 0)
+	img.addr = mlx_get_data_addr (img.img, &img.bits_per_pixel, \
+	&img.line_length, &img.endian);
+	if (ft_strncmp(str, "Mandelbrot", 11) == 0)
 		mandelbrot(img);
-	else if (ft_strncmp(str, "Julia" ,6) == 0)
-		julia(img, argv[2], argv[3]);
-	else 
+	else if (ft_strncmp (str, "Julia", 6) == 0)
+		julia (img, argv[2], argv[3]);
+	else
 	{
-		printf("Error: wrong argument\n");
-		exit(1);
+		printf ("Error: wrong argument\n");
+		exit (1);
 	}
-	mlx_put_image_to_window(mlx, mlx_win, img.img, 0, 0);
-	mlx_loop(mlx);              // (i,j)の位置のピクセルを「マンデルブロ集合でない色」で塗りつぶして
+	mlx_put_image_to_window (mlx, mlx_win, img.img, 0, 0);
+	mlx_loop (mlx);
 }
 
 int	main(int argc, char **argv)
 {
-	if (argc == 2 && ft_strncmp(argv[1], "Mandelbrot",11) == 0)
-	{
-		hoge(argv[1], argv);
-	}
-	else if (argc == 4 && ft_strncmp(argv[1], "Julia" ,6) == 0)
-	{
-		hoge(argv[1], argv);
-	}
-	else 
+	if (argc == 2 && ft_strncmp (argv[1], "Mandelbrot", 11) == 0)
+		create_img_and_select(argv[1], argv);
+	else if (argc == 4 && ft_strncmp (argv[1], "Julia", 6) == 0)
+		create_img_and_select(argv[1], argv);
+	else
 	{
 		printf("Error: wrong argument\n");
-		return (0);
+		exit(1);
 	}
-
-
+	return (0);
 }
