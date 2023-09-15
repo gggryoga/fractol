@@ -1,7 +1,7 @@
 NAME = fractol
-CC	=	cc 
-MLX = -lmlx -framework OpenGL -framework AppKit
-CFLAGS = -Wall -Wextra -Werror
+CC	=	cc -g
+MLX = -lmlx -Lmlx -framework OpenGL -framework AppKit 
+CFLAGS = -Wall -Wextra -Werror -I include
 RM = rm -rf
 LIBFT_DIR = libft
 LIBFT = libft/libft.a
@@ -11,7 +11,7 @@ SRCS_OBJS = $(SRCS_LST:.c=.o)
 all:	$(NAME) 
 
 $(NAME): $(LIBFT) $(SRCS_OBJS)
-	$(CC) $(CFLAGS) $(SRCS_OBJS) $(MLX) -o $(NAME) $(LIBFT)
+	$(CC) $(SRCS_OBJS) $(MLX) -o $(NAME) $(LIBFT)
 
 $(LIBFT):
 	make -C $(LIBFT_DIR)

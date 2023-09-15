@@ -32,26 +32,31 @@ int mandelbrot(void)
 	img.img = mlx_new_image(mlx, img.line_length, img.bits_per_pixel);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
 								&img.endian);
-								i = 0;
-	while (i < img.line_length)
-	{
+	i = 0;
+	while (i < 1920) {
 		j = 0;
-		while (j < img.bits_per_pixel)
-		{
-			x = (i - img.line_length / 2) / (img.line_length / 4);            // ピクセルの位置を定数Cの実部に変換
-			y = (j - img.bits_per_pixel / 2) / (img.line_length / 4);            // ピクセルの位置を定数Cの虚部に変換
-			a = 0.0;                          // zの実部を0に初期化
-			b = 0.0;                          // zの虚部を0に初期化
-			k = 0;                            // くり返し回数を0に初期化
-			while (a * a + b * b < 4.0 && k < 256)
-			{
-				_a = a * a - b * b + x;        // zの実部を更新
-				_b = 2.0 * a * b + y;          // zの虚部を更新
-				a = _a;                        // zの実部を更新
-				b = _b;                        // zの虚部を更新
-				k++;                           // くり返し回数を1増やす
+		while (j < 1080) {
+			x = (i - 1920 / 2.0) / (1920 / 4.0);  // 定数Cの実部
+			y = (j - 1080 / 2.0) / (1080 / 4.0);  // 定数Cの虚部
+			printf ("%f %f\n", x, y);
+			a = 0.0;  // 複素数zの実部
+			b = 0.0;  // 複素数zの虚部
+			k = 0;
+			while (k < 100) {
+				_a = a * a - b * b + x;  // 複素数zの実部を更新
+				_b = 2.0 * a * b + y;  // 複素数zの虚部を更新
+				if (_a * _a + _b * _b > 4.0) {
+					break;
+				}
+				a = _a;
+				b = _b;
+				k++;
 			}
-			my_mlx_pixel_put(&img, i, j, k * 256 * 256); // (i,j)の位置のピクセルを「マンデルブロ集合でない色」で塗りつぶして
+			if (k == 100) {
+				my_mlx_pixel_put(&img, i, j, 0x000000);  // (i,j)の位置のピクセルを「マンデルブロ集合でない色」で塗りつぶして
+			} else {
+				my_mlx_pixel_put(&img, i, j, 0xFF0000);  // (i,j)の位置のピクセルを「マンデルブロ集合である色」で塗りつぶして
+			}
 			j++;
 		}
 		i++;
