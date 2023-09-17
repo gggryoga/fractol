@@ -4,7 +4,7 @@
 
 # define WIDTH 800
 # define HEIGHT 800
-# define K_MAX 500
+# define K_MAX 50
 #  define KB_ESC 53
 # define ZOOM_FACTOR 2
 
