@@ -1,7 +1,9 @@
 NAME = fractol
 CC	=	cc -g
 MLX = -lmlx -Lmlx -framework OpenGL -framework AppKit 
-CFLAGS = -Wall -Wextra -Werror -I include
+# CFLAGS = -Wall -Wextra -Werror -I include
+CFLAGS = -I include
+
 RM = rm -rf
 LIBFT_DIR = libft
 LIBFT = libft/libft.a

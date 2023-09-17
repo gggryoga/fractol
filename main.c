@@ -116,16 +116,19 @@ int	mandelbrot(t_data img)
 
 void		*exiterror(char *reason, t_data img, void *mlx, void *win)
 {
-	ft_putendl_fd(reason,0);
-	// ft_bzero(img.addr, WIDTH * HEIGHT * (img.endian / 8));
-	mlx_destroy_window(mlx, win);
-	// mlx_destroy_image(mlx, img.img);
-	exit(1);
-	free(mlx);
-	free(win);
-	free(img.img);
-	free(img.addr);
-	// return (NULL);
+	if (img.img)
+	{
+		ft_putendl_fd(reason,0);
+		// ft_bzero(img.addr, WIDTH * HEIGHT * (img.endian / 8));
+		// mlx_destroy_image(mlx, img.img);
+		// mlx_destroy_window(mlx, win);
+		exit(1);
+	}
+	// free(mlx);
+	// free(win);
+	// free(img.img);
+	// free(img.addr);
+	return (NULL);
 }
 // {
 // 	ft_putendl(reason);
@@ -186,7 +189,7 @@ int	main(int argc, char **argv)
 }
 
 
-// __attribute__((destructor))
-// static void	destructor(void){
-// 	system("leaks -q fractol");
-// }
+__attribute__((destructor))
+static void	destructor(void){
+	system("leaks -q fractol");
+}
