@@ -6,6 +6,7 @@
 # define HEIGHT 800
 # define K_MAX 500
 #  define KB_ESC 53
+# define ZOOM_FACTOR 2
 
 # include <stdio.h>
 # include <unistd.h>

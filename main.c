@@ -8,6 +8,11 @@ typedef struct	s_data {
 	int		endian;
 	double constant_x;
 	double constant_y;
+	void	*mlx;
+	void	*win;
+	char	*win_name;
+	double	zoomout;
+	double	zoomin;
 }				t_data;
 
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
@@ -35,6 +40,8 @@ int	calculate(double a, double b,t_data img, int i, int j)
 		b = new_b;
 		k++;
 	}
+	printf("a: %f\n", a);
+	printf("b: %f\n", b);
 	if (k == K_MAX)
 		my_mlx_pixel_put(&img, i, j, 0xff00ff);  // (i,j)の位置のピクセルを「マンデルブロ集合でない色」で塗りつぶして
 	else if (k < K_MAX && k > K_MAX * 0.04)
@@ -85,7 +92,7 @@ int	julia(t_data img, char *real, char *imaginary)
 		j = 0;
 		while (j < HEIGHT)
 		{
-			a = (i - WIDTH / 2.0) / (WIDTH / 4.0);
+			a = (i - WIDTH / 2.0) / (WIDTH * zoom / 4.0);
 			b = (j - HEIGHT / 2.0) / (HEIGHT / 4.0);
 			j = calculate(a, b, img, i, j);
 		}
@@ -114,64 +121,160 @@ int	mandelbrot(t_data img)
 	return (0);
 }
 
-void		*exiterror(char *reason, t_data img, void *mlx, void *win)
+void		*exiterror(char *reason, t_data *img, void *mlx, void *win)
 {
-	if (img.img)
+	printf("img.img: %p\n", img->img);
+	if (img->img)
 	{
 		ft_putendl_fd(reason,0);
-		// ft_bzero(img.addr, WIDTH * HEIGHT * (img.endian / 8));
-		// mlx_destroy_image(mlx, img.img);
-		// mlx_destroy_window(mlx, win);
-		exit(1);
+		mlx_destroy_image(mlx, img->img);
+		mlx_destroy_window(mlx, win);
+		exit(0);
 	}
-	// free(mlx);
-	// free(win);
-	// free(img.img);
-	// free(img.addr);
 	return (NULL);
 }
+
+// int	mouse_hook(int button, int x, int y, t_data *img)
 // {
-// 	ft_putendl(reason);
-// 	ft_bzero(img.bits_per_pixel, WIDTH * HEIGHT * (img.endian / 8));
-// 	mlx_destroy_window(fr->mlx, fr->win);
-// 	mlx_destroy_image(fr->mlx, img.img);
-// 	free(fr);
-// 	exit(0);
-// 	return (NULL);
+// 	if (button == 4)
+// 	{
+// 		img->constant_x = (x - WIDTH / 2.0) / (WIDTH / 4.0);
+// 		img->constant_y = (y - HEIGHT / 2.0) / (HEIGHT / 4.0);
+// 		mlx_clear_window(img->mlx, img->win);
+// 		img->img = mlx_new_image(img->mlx, WIDTH, HEIGHT);
+// 		img->addr = mlx_get_data_addr (img->img, &img->bits_per_pixel, \
+// 		&img->line_length, &img->endian);
+// 		mlx_put_image_to_window (img->mlx, img->win, img->img, 0, 0);
+// 	}
+// 	return (0);
 // }
 
-int			key_handler(int key, t_data img, void *mlx, void *win)
+void putimg(t_data img, char **argv)
 {
-	if (key == KB_ESC)
-		exiterror("\b", img, mlx, win);
-	return (0);
-}
-
-void	create_img_and_select(char *str, char **argv)
-{
-	void	*mlx;
-	void	*mlx_win;
-	t_data	img;
-
-	mlx = mlx_init();
-	mlx_win = mlx_new_window(mlx, WIDTH, HEIGHT, str);
-	img.img = mlx_new_image(mlx, WIDTH, HEIGHT);
+	img.img = mlx_new_image(img.mlx, WIDTH, HEIGHT);
 	img.addr = mlx_get_data_addr (img.img, &img.bits_per_pixel, \
 	&img.line_length, &img.endian);
-	if (ft_strncmp(str, "Mandelbrot", 11) == 0)
+	if (ft_strncmp(img.win_name, "Mandelbrot", 11) == 0)
 		mandelbrot(img);
-	else if (ft_strncmp (str, "Julia", 6) == 0)
+	else if (ft_strncmp (img.win_name, "Julia", 6) == 0)
 		julia (img, argv[2], argv[3]);
 	else
 	{
-		printf ("Error: wrong argument\n");
+		printf ("Error: wrong argument\nexp: ./fractol Mandelbrot\n");
+		printf ("exp: ./fractol Julia -0.4 0.6\n");
 		exit (1);
 	}
-	mlx_put_image_to_window (mlx, mlx_win, img.img, 0, 0);
-	mlx_hook(mlx_win, 2, 5, key_handler, &img);
-	// mlx_mouse_hook(mlx_win, mouse_hook, &img);
-	// mlx_key_hook(mlx_win, key_hook, &img);
-	mlx_loop (mlx);
+	mlx_put_image_to_window (img.mlx, img.win, img.img, 0, 0);
+}
+
+int mouse_hook(int button, int x, int y, t_data *img)
+{
+	printf("button: %d\n", button);
+	if (button == 4) // マウスホイールを上にスクロールした場合（拡大）
+	{
+		img->constant_x = (x - WIDTH / 2.0) / (WIDTH / 4.0);
+		img->constant_y = (y - HEIGHT / 2.0) / (HEIGHT / 4.0);
+		img->constant_x *= img->zoomout; // ズーム
+		img->constant_y *= img->zoomout;
+	}
+	else if (button == 5) // マウスホイールを下にスクロールした場合（縮小）
+	{
+		img->constant_x = (x - WIDTH / 2.0) / (WIDTH / 4.0);
+		img->constant_y = (y - HEIGHT / 2.0) / (HEIGHT / 4.0);
+		img->constant_x *= img->zoomin; // ズーム
+		img->constant_y *= img->zoomin;
+	}
+	else
+		return (0);
+	img->img = mlx_new_image(img->mlx, WIDTH, HEIGHT);
+	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel, &img->line_length, &img->endian);
+
+	// 画像を再計算
+	printf("a\n");
+	calculate(0, 0, *img, 0, 0);
+
+	// if (ft_strncmp(img->win_name, "Mandelbrot", 11) == 0)
+	// 	mandelbrot(*img);
+	// else if (ft_strncmp(img->win_name, "Julia", 6) == 0)
+	// 	julia(*img, argv[2], argv[3]);
+	// else
+	// {
+	// 	printf("Error: wrong argument\nexp: ./fractol Mandelbrot\n");
+	// 	printf("exp: ./fractol Julia -0.4 0.6\n");
+	// 	exit(1);
+	// }
+
+	mlx_put_image_to_window(img->mlx, img->win, img->img, 0, 0);
+	return (0);
+}
+
+// ...
+
+// void create_img_and_select(char *str, char **argv)
+// {
+// 	t_data img;
+
+// 	img.mlx = mlx_init();
+// 	img.win = mlx_new_window(img.mlx, WIDTH, HEIGHT, str);
+// 	img.img = mlx_new_image(img.mlx, WIDTH, HEIGHT);
+// 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
+// 	img.win_name = str; // ウィンドウの名前を保存
+
+// 	if (ft_strncmp(str, "Mandelbrot", 11) == 0)
+// 		mandelbrot(img);
+// 	else if (ft_strncmp(str, "Julia", 6) == 0)
+// 		julia(img, argv[2], argv[3]);
+// 	else
+// 	{
+// 		printf("Error: wrong argument\nexp: ./fractol Mandelbrot\n");
+// 		printf("exp: ./fractol Julia -0.4 0.6\n");
+// 		exit(1);
+// 	}
+
+// 	mlx_put_image_to_window(img.mlx, img.win, img.img, 0, 0);
+// 	mlx_hook(img.win, 2, 5, key_handler, &img);
+// 	mlx_mouse_hook(img.win, mouse_hook, &img);
+// 	mlx_loop(img.mlx);
+// }
+
+
+
+
+int			key_handler(int key, t_data *img)
+{
+	if (key == KB_ESC)
+		exiterror("\b", img, img->mlx, img->win);
+	return (0);
+}
+
+
+void	create_img_and_select(char *str, char **argv)
+{
+	t_data	img;
+
+	img.zoomout = 0.005;
+	img.zoomin = 1.00001;
+	img.win_name = str;
+	img.mlx = mlx_init();
+	img.win = mlx_new_window(img.mlx, WIDTH, HEIGHT, img.win_name);
+	putimg(img, argv);
+	// img.img = mlx_new_image(img.mlx, WIDTH, HEIGHT);
+	// img.addr = mlx_get_data_addr (img.img, &img.bits_per_pixel, \
+	// &img.line_length, &img.endian);
+	// if (ft_strncmp(str, "Mandelbrot", 11) == 0)
+	// 	mandelbrot(img);
+	// else if (ft_strncmp (str, "Julia", 6) == 0)
+	// 	julia (img, argv[2], argv[3]);
+	// else
+	// {
+	// 	printf ("Error: wrong argument\nexp: ./fractol Mandelbrot\n");
+	// 	printf ("exp: ./fractol Julia -0.4 0.6\n");
+	// 	exit (1);
+	// }
+	// mlx_put_image_to_window (img.mlx, img.win, img.img, 0, 0);
+	mlx_hook(img.win, 2, 5, key_handler, &img);
+	mlx_mouse_hook(img.win, mouse_hook, &img);
+	mlx_loop (img.mlx);
 }
 
 int	main(int argc, char **argv)
