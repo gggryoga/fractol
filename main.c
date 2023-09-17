@@ -114,6 +114,36 @@ int	mandelbrot(t_data img)
 	return (0);
 }
 
+void		*exiterror(char *reason, t_data img, void *mlx, void *win)
+{
+	ft_putendl_fd(reason,0);
+	// ft_bzero(img.addr, WIDTH * HEIGHT * (img.endian / 8));
+	mlx_destroy_window(mlx, win);
+	// mlx_destroy_image(mlx, img.img);
+	exit(1);
+	free(mlx);
+	free(win);
+	free(img.img);
+	free(img.addr);
+	// return (NULL);
+}
+// {
+// 	ft_putendl(reason);
+// 	ft_bzero(img.bits_per_pixel, WIDTH * HEIGHT * (img.endian / 8));
+// 	mlx_destroy_window(fr->mlx, fr->win);
+// 	mlx_destroy_image(fr->mlx, img.img);
+// 	free(fr);
+// 	exit(0);
+// 	return (NULL);
+// }
+
+int			key_handler(int key, t_data img, void *mlx, void *win)
+{
+	if (key == KB_ESC)
+		exiterror("\b", img, mlx, win);
+	return (0);
+}
+
 void	create_img_and_select(char *str, char **argv)
 {
 	void	*mlx;
@@ -135,6 +165,9 @@ void	create_img_and_select(char *str, char **argv)
 		exit (1);
 	}
 	mlx_put_image_to_window (mlx, mlx_win, img.img, 0, 0);
+	mlx_hook(mlx_win, 2, 5, key_handler, &img);
+	// mlx_mouse_hook(mlx_win, mouse_hook, &img);
+	// mlx_key_hook(mlx_win, key_hook, &img);
 	mlx_loop (mlx);
 }
 
@@ -151,3 +184,9 @@ int	main(int argc, char **argv)
 	}
 	return (0);
 }
+
+
+// __attribute__((destructor))
+// static void	destructor(void){
+// 	system("leaks -q fractol");
+// }

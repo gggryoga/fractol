@@ -5,6 +5,7 @@
 # define WIDTH 800
 # define HEIGHT 800
 # define K_MAX 500
+#  define KB_ESC 53
 
 # include <stdio.h>
 # include <unistd.h>
