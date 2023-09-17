@@ -34,7 +34,7 @@
 NAME = fractol
 CC	=	cc 
 MLX = -lmlx -framework OpenGL -framework AppKit
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror
 RM = rm -rf
 LIBFT_DIR = libft
 LIBFT = libft/libft.a

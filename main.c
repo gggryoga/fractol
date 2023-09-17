@@ -1,20 +1,5 @@
 #include "fractol.h"
-
-typedef struct	s_data {
-	void	*img;
-	char	*addr;
-	int		bits_per_pixel;
-	int		line_length;
-	int		endian;
-	double constant_x;
-	double constant_y;
-	void	*mlx;
-	void	*win;
-	char	*win_name;
-	double	zoom;
-	char	*real;
-	char	*imaginary;
-}				t_data;
+#include <stdio.h>
 
 void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
@@ -129,7 +114,6 @@ int	mandelbrot(t_data *img)
 
 void		*exiterror(char *reason, t_data *img, void *mlx, void *win)
 {
-	// printf("img->img: %p\n", img->img);
 	if (img->img)
 	{
 		ft_putendl_fd(reason,0);
@@ -159,28 +143,20 @@ int mouse_hook(int button, int x, int y, t_data *img)
 {
 	if (button == 4) // マウスホイールを上にスクロールした場合（拡大）
 	{
-		// img->constant_x = (x - WIDTH / 2.0) / (WIDTH / 4.0);
-		// img->constant_y = (y - HEIGHT / 2.0) / (HEIGHT / 4.0);
 		img->zoom += 1.1;
 	}
 	else if (button == 5) // マウスホイールを下にスクロールした場合（縮小）
 	{
-		// img->constant_x = (x - WIDTH / 2.0) / (WIDTH / 4.0);
-		// img->constant_y = (y - HEIGHT / 2.0) / (HEIGHT / 4.0);
-		// img->constant_x *= img->zoomin; // ズーム
-		// img->constant_y *= img->zoomin;
 		img->zoom *= 0.9;
-		printf("img->zoom: %f\n", img->zoom);
 	}
 	else
 		return (0);
 	(void)x;
 	(void)y;
-	if (ft_strncmp(img->win_name, "Mandelbrot", 10) == 0)
+	if (ft_strncmp(img->win_name, "Mandelbrot", 11) == 0)
 		mandelbrot(img);
 	else if (ft_strncmp(img->win_name, "Julia", 6) == 0)
 		julia(img, img->real, img->imaginary);
-	mandelbrot(img);
 	mlx_put_image_to_window(img->mlx, img->win, img->img, 0, 0);
 	return (0);
 }
@@ -192,6 +168,12 @@ int			key_handler(int key, t_data *img)
 	return (0);
 }
 
+int mlxfree(t_data *img)
+{
+	mlx_destroy_image(img->mlx, img->img);
+	mlx_destroy_window(img->mlx, img->win);
+	exit(0);
+}
 
 void	create_img_and_select(char *str, char **argv)
 {
@@ -206,6 +188,7 @@ void	create_img_and_select(char *str, char **argv)
 	&img.line_length, &img.endian);
 	putimg(&img, argv);
 	mlx_hook(img.win, 2, 5, key_handler, &img);
+	mlx_hook(img.win, 17, 0L, mlxfree, &img);
 	mlx_mouse_hook(img.win, mouse_hook, &img);
 	mlx_loop (img.mlx);
 }
