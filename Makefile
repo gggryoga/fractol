@@ -38,7 +38,7 @@ CFLAGS = -Wall -Wextra -Werror
 RM = rm -rf
 LIBFT_DIR = libft
 LIBFT = libft/libft.a
-SRCS_LST	=	main.c
+SRCS_LST	=	main.c mandelbrot.c julia.c hook.c destroy.c
 SRCS_OBJS = $(SRCS_LST:.c=.o)
 
 all:	$(NAME) 
