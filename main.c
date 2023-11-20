@@ -38,13 +38,13 @@ int	calculate(double a, double b, t_data *img)
 		k++;
 	}
 	if (k == K_MAX)
-		my_mlx_pixel_put (img, img->i, img->j, 0xff00ff);
-	else if (k < K_MAX && k > K_MAX * 0.08)
-		my_mlx_pixel_put (img, img->i, img->j, 0x00990000);
-	else if (k < K_MAX * 0.08 && k > K_MAX * 0.001)
-		my_mlx_pixel_put (img, img->i, img->j, 0x009933FF);
-	else
 		my_mlx_pixel_put (img, img->i, img->j, 0x000000);
+	else if (k < K_MAX && k > K_MAX * 0.7)
+		my_mlx_pixel_put (img, img->i, img->j, 0xffffff);
+	else if (k <= K_MAX * 0.7  && k > K_MAX * 0.02)
+		my_mlx_pixel_put (img, img->i, img->j, 0x0000FF);
+	else
+		my_mlx_pixel_put (img, img->i, img->j, 0xffffff);
 	return (img->j + 1);
 }
 

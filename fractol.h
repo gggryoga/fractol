@@ -23,8 +23,10 @@
 
 # define WIDTH 800
 # define HEIGHT 800
-# define K_MAX 50
+# define K_MAX 100
 # define KB_ESC 53
+# define KB_UP 126
+# define KB_DOWN 125
 # define ZOOM_FACTOR 2
 # define ON_DESTROY 12
 

@@ -25,8 +25,8 @@ int	mandelbrot(t_data *img)
 		img->j = 0;
 		while (img->j < HEIGHT)
 		{
-			img->constant_x = cordinate(img->i) * img->zoom;
-			img->constant_y = cordinate(img->j) * img->zoom;
+			img->constant_x = (img->i - WIDTH / 2.0) / WIDTH * img->zoom * 4.0;
+			img->constant_y = (img->j - HEIGHT / 2.0) / HEIGHT * img->zoom * 4.0;
 			img->j = calculate(0, 0, img);
 		}
 		img->i++;

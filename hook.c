@@ -38,5 +38,25 @@ int	key_handler(int key, t_data *img)
 {
 	if (key == KB_ESC)
 		exiterror("\b", img, img->mlx, img->win);
+	else if (key == KB_UP)
+	{
+		img->zoom += 1.1;
+		if (ft_strncmp(img->win_name, "Mandelbrot", 11) == 0)
+			mandelbrot(img);
+		else if (ft_strncmp(img->win_name, "Julia", 6) == 0)
+			julia(img, img->real, img->imaginary);
+		mlx_put_image_to_window(img->mlx, img->win, img->img, 0, 0);
+		return (0);
+	}
+	else if (key == KB_DOWN)
+	{
+		img->zoom *= 0.9;
+		if (ft_strncmp(img->win_name, "Mandelbrot", 11) == 0)
+			mandelbrot(img);
+		else if (ft_strncmp(img->win_name, "Julia", 6) == 0)
+			julia(img, img->real, img->imaginary);
+		mlx_put_image_to_window(img->mlx, img->win, img->img, 0, 0);
+		return (0);
+	}
 	return (0);
 }
